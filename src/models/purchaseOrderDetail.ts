@@ -1,0 +1,80 @@
+import { Model, DataTypes } from "sequelize";
+import sequelize from "../config/db";
+import PurchaseOrder from "../models/purchaseOrder";
+import Product from "../models/product";
+
+class PurchaseOrderDetail extends Model {
+  public id!: number;
+  public purchase_order_id!: number;
+  public product_id!: number;
+  public quantity!: number;
+  public unit_price!: number;
+  public total_price!: number;
+  public createdAt!: Date;
+  public updatedAt!: Date;
+}
+
+PurchaseOrderDetail.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    purchase_order_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    product_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        isInt: true,
+        min: 1,
+      },
+    },
+    unit_price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    total_price: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: "created_at",
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: "updated_at",
+    },
+  },
+  {
+    sequelize,
+    modelName: "PurchaseOrderDetail",
+    tableName: "purchase_order_details",
+    timestamps: false,
+  }
+);
+
+// Liên kết với PurchaseOrder
+PurchaseOrderDetail.belongsTo(PurchaseOrder, {
+  foreignKey: "purchase_order_id",
+  as: "purchaseOrder",
+});
+
+// Liên kết với Product
+PurchaseOrderDetail.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+PurchaseOrder.hasMany(PurchaseOrderDetail, {
+  foreignKey: "purchase_order_id",
+  as: "PurchaseOrderDetail",
+});
+export default PurchaseOrderDetail;
