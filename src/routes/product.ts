@@ -16,9 +16,10 @@ router.get("/search", ProductController.searchProducts);
 router.get("/:product_id", ProductController.getProductById);
 router.put(
   "/:product_id",
+  authenticateToken,
   uploadImages.single("image_url"),
   ProductController.updateProduct
 );
-router.delete("/:product_id", ProductController.deleteProduct);
+router.delete("/:product_id",authenticateToken, ProductController.deleteProduct);
 
 export default router;

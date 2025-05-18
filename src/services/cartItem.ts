@@ -18,6 +18,7 @@ export default class CartItemService {
               "discount_price",
               "stock_quantity",
               "unit",
+              "image_url"
             ],
           },
         ],

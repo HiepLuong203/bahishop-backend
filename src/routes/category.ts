@@ -4,10 +4,10 @@ import authenticateToken from "../middlewares/authentication";
 
 const router = Router();
 
-router.post("/", CategoryController.createCategory);
+router.post("/",authenticateToken, CategoryController.createCategory);
 router.get("/", CategoryController.getAllCategories);
-router.get("/:category_id", CategoryController.getCategoryById);
-router.put("/:category_id", CategoryController.updateCategory);
-router.delete("/:category_id", CategoryController.deleteCategory);
+router.get("/:category_id",authenticateToken, CategoryController.getCategoryById);
+router.put("/:category_id",authenticateToken, CategoryController.updateCategory);
+router.delete("/:category_id",authenticateToken, CategoryController.deleteCategory);
 
 export default router;

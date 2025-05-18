@@ -6,7 +6,7 @@ const router = Router();
 
 router.get("/", PurchaseOrderController.getAllPurchaseOrders);
 router.get("/:id", PurchaseOrderController.getPurchaseOrderById);
-router.post("/", PurchaseOrderController.createPurchaseOrder);
-router.put("/:id", PurchaseOrderController.updatePurchaseOrder);
+router.post("/",authenticateToken, PurchaseOrderController.createPurchaseOrder);
+router.put("/:id",authenticateToken, PurchaseOrderController.updatePurchaseOrder);
 
 export default router;

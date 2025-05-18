@@ -6,17 +6,19 @@ export default class ServiceProductImage {
     product_id: number,
     files: Express.Multer.File[]
   ) {
-    // Kiểm tra product_id có tồn tại không
     await ServiceProduct.validateProductId(product_id);
-
-    const images = files.map((file, index) => ({
-      product_id,
-      image_url: `/uploads/${file.filename}`,
-      display_order: index + 1,
-    }));
-
+  
+    const images = files.map((file, index) => {
+      console.log("Uploaded file:", file);  // Log kiểm tra từng file
+      return {
+        product_id,
+        image_url: `/uploads/${file.filename}`,  // Đảm bảo file có đuôi
+        display_order: index + 1,
+      };
+    });
+  
     return ProductImage.bulkCreate(images);
-  }
+  }  
   static async updateProductImage(
     image_id: number,
     data: Partial<ProductImageAttributes>,
@@ -25,10 +27,17 @@ export default class ServiceProductImage {
     await ServiceProduct.validateProductId(data.product_id ?? null);
     const image = await ProductImage.findByPk(image_id);
     if (!image) throw new Error("Image not found");
-    data.image_url = `/uploads/${file.filename}`;
-    await image.save();
+    // Nếu có file, cập nhật đường dẫn ảnh
+    if (file) {
+      console.log("Uploaded file (update):", file); 
+      data.image_url = `/uploads/${file.filename}`;  
+    }
+  
+    // Cập nhật thông tin ảnh
+    await image.update(data);
     return image;
   }
+  
   static async deleteProductImage(image_id: number) {
     const image = await ProductImage.findByPk(image_id);
     if (!image) throw new Error("Image not found");
