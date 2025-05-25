@@ -51,7 +51,7 @@ PurchaseOrder.init(
     sequelize,
     modelName: "PurchaseOrder",
     tableName: "purchase_orders",
-    timestamps: false,
+    timestamps: true,
   }
 );
 // Liên kết với Supplier

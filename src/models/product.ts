@@ -2,7 +2,7 @@ import { Model, DataTypes } from "sequelize";
 import sequelize from "../config/db";
 import Category from "../models/category";
 import Supplier from "../models/supplier";
-import ProductImage from "./productImage";
+import ProductImage from "../models/productImage";
 class Product extends Model {
   public product_id!: number;
   public name!: string;
@@ -106,7 +106,8 @@ Product.init(
    
     is_active: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      allowNull: false,
+      defaultValue: true,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -125,7 +126,7 @@ Product.init(
     sequelize,
     modelName: "Product",
     tableName: "products",
-    timestamps: false,
+    timestamps: true,
   }
 );
 
@@ -144,6 +145,15 @@ ProductImage.belongsTo(Product, {
   foreignKey: "product_id",
 });
 // Liên kết với Supplier
+Product.belongsTo(Supplier, {
+  foreignKey: "supplier_id",
+  as: "supplier",
+});
+Supplier.hasMany(Product, {
+  foreignKey: "supplier_id",
+  as: "products",
+});
+// Liên kết với purchaseOrder
 Product.belongsTo(Supplier, {
   foreignKey: "supplier_id",
   as: "supplier",

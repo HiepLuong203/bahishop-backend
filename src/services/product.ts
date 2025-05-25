@@ -5,6 +5,7 @@ import { ProductAttributes } from "../types/product";
 import ServiceCategory from "../services/category";
 import ServiceSupplier from "../services/supplier";
 import ProductImage from "../models/productImage";
+import Supplier from "../models/supplier";
 export default class ServiceProduct {
   //tạo sản phẩm
   static async createProduct(
@@ -20,7 +21,12 @@ export default class ServiceProduct {
   }
   //lấy tất cả sản phẩm
   static async getAllProducts() {
-    return Product.findAll({ include: [{ model: Category, as: "category" }] });
+    return Product.findAll({
+      include: [
+        { model: Category, as: "category" },
+        { model: Supplier, as: "supplier", attributes: ["supplier_id", "name"] },
+      ],
+    });
   }
 
   static async getProductById(product_id: number) {
@@ -33,6 +39,7 @@ export default class ServiceProduct {
           separate: true,
           order: [["display_order", "ASC"]],
         },
+        { model: Supplier, as: "supplier" },
       ],
     });
     if (!product) throw new Error("Product not found");
@@ -96,5 +103,48 @@ export default class ServiceProduct {
       where: { category_id: category_id, is_active: true },
     });
   }
-  
+  static async filterProductsByPrice(minPrice?: number, maxPrice?: number) {
+    const whereCondition: any = {
+      is_active: true,
+    };
+
+    if (minPrice !== undefined && maxPrice !== undefined) {
+      whereCondition.price = {
+        [Op.between]: [minPrice, maxPrice],
+      };
+    } else if (minPrice !== undefined) {
+      whereCondition.price = {
+        [Op.gte]: minPrice,
+      };
+    } else if (maxPrice !== undefined) {
+      whereCondition.price = {
+        [Op.lte]: maxPrice,
+      };
+    }
+
+    return Product.findAll({ where: whereCondition });
+  }
+  static async countAllProducts() {
+    const [total, activeCount, inactiveCount] = await Promise.all([
+      Product.count({
+        distinct: true,
+        col: 'product_id',
+      }),
+      Product.count({
+        where: {
+          is_active: true,
+        },
+        distinct: true,
+        col: 'product_id',
+      }),
+      Product.count({
+        where: {
+          is_active: false,
+        },
+        distinct: true,
+        col: 'product_id',
+      }),
+    ]);
+    return {total, activeCount, inactiveCount  };
+  }
 }

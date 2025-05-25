@@ -61,12 +61,14 @@ class UserController {
   static async verifyEmail(req: Request, res: Response) {
     try {
       const { token } = req.query;
-      const result = await UserService.verifyEmail(token as string);
-      res.json(result);
+      await UserService.verifyEmail(token as string);
+
+      res.redirect("http://localhost:3000/profile");
     } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      res.redirect(`http://localhost:3000/error?message=${encodeURIComponent(error.message)}`);
     }
   }
+
   static async forgetPassword(req: Request, res: Response) {
     try {
       const { username, email } = req.body;
@@ -101,6 +103,15 @@ class UserController {
       res.status(400).json({ message: error.message });
     }
   }
+  static async getCustomerStats(req: Request, res: Response) {
+    try {
+      const result = await UserService.getAllCustomersSortedByCreatedAt();
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
 }
 
 export default UserController;
