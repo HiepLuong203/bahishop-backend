@@ -153,13 +153,4 @@ Supplier.hasMany(Product, {
   foreignKey: "supplier_id",
   as: "products",
 });
-// Liên kết với purchaseOrder
-Product.belongsTo(Supplier, {
-  foreignKey: "supplier_id",
-  as: "supplier",
-});
-Supplier.hasMany(Product, {
-  foreignKey: "supplier_id",
-  as: "products",
-});
 export default Product;
