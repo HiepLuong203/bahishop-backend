@@ -1,7 +1,7 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "../config/db";
-import Product from "./product";
-import Promotion from "./promotion";
+import Product from "../models/product";
+import Promotion from "../models/promotion";
 
 class ProductPromotion extends Model {
   public product_promotion_id!: number;

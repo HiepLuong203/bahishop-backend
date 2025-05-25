@@ -11,8 +11,10 @@ router.post(
   ProductController.createProduct
 );
 router.get("/", ProductController.getAllProducts);
+router.get('/count-all-products',authenticateToken, ProductController.countAll);
 router.get("/category/:category_id", ProductController.getProductsByCategory);
 router.get("/search", ProductController.searchProducts);
+router.get("/filter/price", ProductController.filterByPrice);
 router.get("/:product_id", ProductController.getProductById);
 router.put(
   "/:product_id",
@@ -21,5 +23,4 @@ router.put(
   ProductController.updateProduct
 );
 router.delete("/:product_id",authenticateToken, ProductController.deleteProduct);
-
 export default router;

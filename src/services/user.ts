@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mailjet from "node-mailjet";
 import { UpdateUserAttributes, RegisUserAttributes } from "../types/user";
+import { Op } from "sequelize";
 const JWT_SECRET = process.env.JWT_SECRET!;
 class ServiceUser {
   static async register(data: Partial<RegisUserAttributes>) {
@@ -222,6 +223,36 @@ class ServiceUser {
     await user.save();
 
     return { message: "Đổi mật khẩu thành công." };
+  }
+  static async getAllCustomersSortedByCreatedAt() {
+    // Lấy ngày hiện tại theo 00:00:00 và 23:59:59
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    // Tìm tất cả user có role là customer và sắp xếp theo ngày tạo
+    const customers = await User.findAll({
+      where: { role: "customer" },
+      order: [["created_at", "ASC"]],
+    });
+
+    // Lọc user có ngày tạo trong hôm nay
+    const todayNewUsers = await User.count({
+      where: {
+        role: "customer",
+        created_at: {
+          [Op.between]: [todayStart, todayEnd],
+        },
+      },
+    });
+
+    return {
+      total_customers: customers.length,
+      today_new_customers: todayNewUsers,
+      customers,
+    };
   }
 }
 

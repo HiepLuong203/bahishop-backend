@@ -58,7 +58,7 @@ PurchaseOrderDetail.init(
     sequelize,
     modelName: "PurchaseOrderDetail",
     tableName: "purchase_order_details",
-    timestamps: false,
+    timestamps: true,
   }
 );
 

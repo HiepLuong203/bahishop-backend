@@ -70,6 +70,35 @@ class OrderController {
       res.status(500).json({ message: error });
     }
   }
+  async getAllOrders(req: Request, res: Response): Promise<void> {
+    try {
+      const user_id = (req as any).user.id;
+      const orders = await ServiceOrder.getAllOrder(user_id);
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ message: error });
+    }
+  }
+  async cancelOrder(req: Request, res: Response): Promise<void> {
+    try {
+      const user_id = (req as any).user.id;
+      const order_id = Number(req.params.order_id);
+
+      const result = await ServiceOrder.updateOrderStatus(order_id, user_id, "cancelled");
+      res.json(result);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+ async countAll(req: Request, res: Response) {
+  try {
+      const count = await ServiceOrder.countAllOrders();
+      res.status(200).json(count);
+    } catch (error) {
+      console.error('Error counting all orders:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
 }
 
 export default new OrderController();

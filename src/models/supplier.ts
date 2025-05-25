@@ -59,7 +59,7 @@ Supplier.init(
     sequelize,
     modelName: "Supplier",
     tableName: "suppliers",
-    timestamps: false,
+    timestamps: true,
   }
 );
 

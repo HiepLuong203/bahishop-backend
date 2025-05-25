@@ -1,5 +1,6 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "../config/db";
+import OrderItem from "../models/orderItem";
 import User from "../models/user";
 class Order extends Model {
   public order_id!: number;
@@ -81,4 +82,5 @@ Order.init(
   }
 );
 Order.belongsTo(User, { foreignKey: "user_id", as: "user" });
+Order.hasMany(OrderItem, { foreignKey: "order_id", as: "orderItems" });
 export default Order;

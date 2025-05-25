@@ -46,7 +46,7 @@ CartItem.init(
     sequelize,
     modelName: "CartItem",
     tableName: "cart_items",
-    timestamps: false,
+    timestamps: true,
   }
 );
 CartItem.belongsTo(Product, { foreignKey: "product_id", as: "product" });

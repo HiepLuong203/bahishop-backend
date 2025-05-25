@@ -68,7 +68,7 @@ Promotion.init(
     sequelize,
     modelName: "Promotion",
     tableName: "promotions",
-    timestamps: false,
+    timestamps: true,
   }
 );
 

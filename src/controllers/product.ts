@@ -91,6 +91,26 @@ class ProductController {
       res.status(500).json({ message: error }); 
     }
   }
+  async filterByPrice(req: Request, res: Response) {
+    try {
+      const min = req.query.min ? Number(req.query.min) : undefined;
+      const max = req.query.max ? Number(req.query.max) : undefined;
+
+      const products = await ServiceProduct.filterProductsByPrice(min, max);
+      res.json(products);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  async countAll(req: Request, res: Response) {
+    try {
+      const count = await ServiceProduct.countAllProducts();
+      res.status(200).json(count);
+    } catch (error) {
+      console.error('Error counting all products:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
 }
 
 export default new ProductController();

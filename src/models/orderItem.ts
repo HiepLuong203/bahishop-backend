@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/db";
-import Order from "./order";
-import Product from "./product";
+import Order from "../models/order";
+import Product from "../models/product";
 
 class OrderItem extends Model {
   public order_item_id!: number;
@@ -35,7 +35,7 @@ OrderItem.init(
   }
 );
 
-OrderItem.belongsTo(Order, { foreignKey: "order_id", as: "order" });
+// OrderItem.belongsTo(Order, { foreignKey: "order_id", as: "order" });
 OrderItem.belongsTo(Product, { foreignKey: "product_id", as: "product" });
 
 export default OrderItem;
