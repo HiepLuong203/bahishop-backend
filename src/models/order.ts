@@ -73,6 +73,10 @@ Order.init(
     notes: {
       type: DataTypes.TEXT,
     },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: "updated_at",
+    }
   },
   {
     sequelize,

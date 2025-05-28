@@ -45,7 +45,31 @@ export default class ServiceProduct {
     if (!product) throw new Error("Product not found");
     return product;
   }
+  static async searchProductsByName(name: string) {
+    try {
+      return await Product.findAll({
+        where: {
+          name: {
+            [Op.like]: `%${name}%`,
+          },
+          is_active: true, // Thêm điều kiện is_active = true
+        },
+      });
+    } catch (error: any) {
+      throw new Error("Error fetching products by name");
+    }
+  }
 
+  static async getProductsByCategory(category_id: number) {
+    return Product.findAll({
+      where: { category_id: category_id, is_active: true },
+    });
+  }
+  static async getProductsByStatus(is_active: boolean) {
+    return Product.findAll({
+      where: { is_active: is_active },
+    });
+  }
   static async updateProduct(
     product_id: number,
     data: Partial<ProductAttributes>,
@@ -83,26 +107,7 @@ export default class ServiceProduct {
       throw error;
     }
   }
-  static async searchProductsByName(name: string) {
-    try {
-      return await Product.findAll({
-        where: {
-          name: {
-            [Op.like]: `%${name}%`,
-          },
-          is_active: true, // Thêm điều kiện is_active = true
-        },
-      });
-    } catch (error: any) {
-      throw new Error("Error fetching products by name");
-    }
-  }
-
-  static async getProductsByCategory(category_id: number) {
-    return Product.findAll({
-      where: { category_id: category_id, is_active: true },
-    });
-  }
+  
   static async filterProductsByPrice(minPrice?: number, maxPrice?: number) {
     const whereCondition: any = {
       is_active: true,

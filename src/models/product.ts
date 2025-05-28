@@ -153,4 +153,5 @@ Supplier.hasMany(Product, {
   foreignKey: "supplier_id",
   as: "products",
 });
+
 export default Product;

@@ -9,7 +9,13 @@ export default class ServiceProductPromotion {
 
     const promotion = await Promotion.findByPk(promotion_id);
     if (!promotion) throw new Error("Promotion not found");
-
+    const today = new Date();
+    if (promotion.end_date && new Date(promotion.end_date) < today) {
+      throw new Error("Khuyến mãi này đã hết hạn");
+    }
+    if (promotion.is_active !== true) {
+      throw new Error("Khuyến mãi đã ngừng hoạt động");
+    }
     // Tính giá khuyến mãi
     let newPrice = product.price;
     if (promotion.discount_type === "percentage") {
@@ -41,7 +47,7 @@ export default class ServiceProductPromotion {
     const product = await Product.findByPk(record.product_id);
     if (product) {
       // Nếu remove promotion, reset lại giá khuyến mãi (về null)
-      await product.update({ sale_price: null });
+      await product.update({ discount_price: null });
     }
 
     await record.destroy();
