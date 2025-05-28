@@ -1,4 +1,5 @@
 import Supplier from "../models/supplier";
+import { Op } from "sequelize";
 import { SupplierAttributes } from "../types/supplier";
 export default class ServiceSupplier {
   // Tạo nhà cung cấp mới
@@ -66,6 +67,20 @@ export default class ServiceSupplier {
        error.validSuppliers = validSuppliers;
        throw error;
      }
-   }
+  }
+  static async getSupplierByName(name: string) {
+    try {
+      const supplier = await Supplier.findAll({
+        where: {
+          name: {
+            [Op.like]: `%${name}%`,
+          },
+        },
+      });
+      return supplier;
+    } catch (error) {
+      throw new Error("Lỗi khi tìm kiếm nhà cung cấp: " + error);
+    }
+  }
 }
 

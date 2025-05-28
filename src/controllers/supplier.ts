@@ -54,6 +54,15 @@ class SupplierController {
       res.status(500).json({ error: error.message });
     }
   }
+  async getSuplierbyName(req: Request, res: Response) {
+    try {
+      const name = req.query.name as string;
+      const suppliers = await ServiceSupplier.getSupplierByName(name);
+      res.json(suppliers);
+    } catch (error:any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 export default new SupplierController();

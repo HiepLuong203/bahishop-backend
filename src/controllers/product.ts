@@ -91,6 +91,20 @@ class ProductController {
       res.status(500).json({ message: error }); 
     }
   }
+  async getProductsByStatus(req: Request, res: Response) {
+    try {
+      // Lấy query string ?is_active=true hoặc false
+      const { is_active } = req.query;
+
+      // Chuyển đổi string "true"/"false" thành boolean
+      const isActiveBool = is_active === "true";
+
+      const products = await ServiceProduct.getProductsByStatus(isActiveBool);
+      res.status(200).json(products);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
   async filterByPrice(req: Request, res: Response) {
     try {
       const min = req.query.min ? Number(req.query.min) : undefined;

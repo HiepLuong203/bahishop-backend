@@ -4,7 +4,7 @@ import ProductImageController from "../controllers/productImage";
 import authenticateToken from "../middlewares/authentication";
 
 const router = express.Router();
-
+router.get("/product/:product_id/images", ProductImageController.getProductImagesByProduct);
 router.post(
   "/:product_id/images",
   authenticateToken,

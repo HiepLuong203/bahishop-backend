@@ -39,5 +39,14 @@ class ProductImageController {
       res.status(400).json({ message: error.message });
     }
   }
+  async getProductImagesByProduct(req: Request, res: Response): Promise<void> {
+    try {
+      const product_id = Number(req.params.product_id);
+      const images = await ServiceProductImage.getProductImagesByProduct(product_id);
+      res.json({ images });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
 }
 export default new ProductImageController();

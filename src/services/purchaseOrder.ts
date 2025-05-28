@@ -1,4 +1,5 @@
 import sequelize from "../config/db";
+import { Op } from "sequelize";
 import PurchaseOrder from "../models/purchaseOrder";
 import Product from "../models/product";
 import ServiceSupplier from "../services/supplier";
@@ -83,11 +84,21 @@ export default class ServicePurchaseOrder {
   }
 
   // Lấy chi tiết đơn nhập hàng theo ID
-  static async getPurchaseOrderById(
-    id: number
-  ): Promise<PurchaseOrderAttributes | null> {
+  static async getPurchaseOrderById(id: number): Promise<PurchaseOrderAttributes | null> {
     return PurchaseOrder.findByPk(id, {
-      include: [{ model: PurchaseOrderDetail, as: "PurchaseOrderDetail" }],
+      include: [
+        {
+          model: PurchaseOrderDetail,
+          as: "PurchaseOrderDetail",
+          include: [
+            {
+              model: Product,
+              as: "product", // tên alias bạn đặt trong association
+              attributes: ["name"], // lấy các trường cụ thể, ví dụ name
+            },
+          ],
+        },
+      ],
     });
   }
 
@@ -167,5 +178,28 @@ export default class ServicePurchaseOrder {
       await transaction.rollback();
       throw error;
     }
+  }
+  static async getPurchaseOrdersByDateRange(fromDate: Date,toDate: Date): Promise<PurchaseOrderAttributes[]> {
+    return PurchaseOrder.findAll({
+      where: {
+        order_date: {
+          [Op.between]: [fromDate, toDate],
+        },
+      },
+      order: [["order_date", "ASC"]], //sắp xếp theo ngày tăng dần
+      include: [
+        {
+          model: PurchaseOrderDetail,
+          as: "PurchaseOrderDetail",
+          include: [
+            {
+              model: Product,
+              as: "product",
+              attributes: ["name"],
+            },
+          ],
+        },
+      ],
+    });
   }
 }

@@ -75,6 +75,35 @@ class PurchaseOrderController {
       res.status(500).json({ error: err.message });
     }
   }
+  async getPurchaseOrdersByDate(req: Request, res: Response): Promise<void> {
+    try {
+      const { from, to } = req.query;          // ?from=YYYY-MM-DD&to=YYYY-MM-DD
+      if (!from || !to) {
+        res.status(400).json({ message: "Thiếu from hoặc to" });return 
+      }
+
+      const fromDate = new Date(from as string);
+      const toDate   = new Date(to as string);
+
+      // kiểm tra date hợp lệ
+      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+        res.status(400).json({ message: "from/to không phải ngày hợp lệ" });return 
+      }
+
+      // đảm bảo toDate >= fromDate
+      if (toDate < fromDate) {
+        res.status(400).json({ message: "to phải >= from" });return 
+      }
+
+      const orders = await ServicePurchaseOrder.getPurchaseOrdersByDateRange(
+        fromDate,
+        toDate
+      );
+      res.json(orders);
+    } catch (err: any) {
+      res.status(500).json({ message: err.message });
+    }
+  }
 }
 
 export default new PurchaseOrderController();

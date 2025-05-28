@@ -11,6 +11,7 @@ router.post(
   ProductController.createProduct
 );
 router.get("/", ProductController.getAllProducts);
+router.get("/status",authenticateToken, ProductController.getProductsByStatus);
 router.get('/count-all-products',authenticateToken, ProductController.countAll);
 router.get("/category/:category_id", ProductController.getProductsByCategory);
 router.get("/search", ProductController.searchProducts);
