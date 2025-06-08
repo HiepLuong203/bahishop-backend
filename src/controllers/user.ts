@@ -30,6 +30,7 @@ class UserController {
           username: user.username,
           email: user.email,
           role: user.role,
+          full_name: user.full_name
         },
       });
     } catch (error: any) {
@@ -92,11 +93,12 @@ class UserController {
   static async changePassword(req: Request, res: Response) {
     try {
       const userId = (req as any).user.id;
-      const { oldPassword, newPassword } = req.body;
+      const { oldPassword, newPassword, confirmPassword } = req.body;
       const result = await UserService.changePassword(
         userId,
         oldPassword,
-        newPassword
+        newPassword,
+        confirmPassword
       );
       res.json(result);
     } catch (error: any) {

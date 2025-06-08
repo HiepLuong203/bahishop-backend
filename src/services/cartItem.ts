@@ -16,18 +16,20 @@ export default class CartItemService {
               "name",
               "price",
               "discount_price",
-              "stock_quantity",
               "unit",
               "image_url"
             ],
           },
+        ],
+        order: [
+          ['added_at', 'DESC'] // Sắp xếp theo thời gian thêm vào, mới nhất hiển thị trước
         ],
       });
     } catch (error) {
       throw error;
     }
   }
-  static async addOrUpdateCartItem(user_id: number, data: CartItemInput) {
+  static async addToCartItem(user_id: number, data: CartItemInput) {
     // 🔒 Kiểm tra tài khoản đã active chưa
     const user = await User.findByPk(user_id);
     if (!user || !user.is_active) {
@@ -54,11 +56,33 @@ export default class CartItemService {
 
     return cartItem;
   }
-  static async getCartItem(user_id: number, product_id: number) {
+  static async getCartItemToCheckoutSingle(user_id: number, product_id: number) {
     return await CartItem.findOne({
       where: { user_id, product_id },
       include: [{ model: Product, as: "product" }],
     });
+  }
+
+  static async updateCartItemQuantity(user_id: number, product_id: number, quantity: number) {
+    if (quantity < 1) {
+      throw new Error("Số lượng phải lớn hơn hoặc bằng 1.");
+    }
+
+    const cartItem = await CartItem.findOne({
+      where: { user_id, product_id },
+    });
+
+    if (!cartItem) {
+      throw new Error("Không tìm thấy sản phẩm trong giỏ hàng.");
+    }
+
+    cartItem.quantity = quantity;
+    await cartItem.save();
+
+    return {
+      message: "Cập nhật số lượng sản phẩm thành công.",
+      cartItem,
+    };
   }
 
   static async removeCartItem(user_id: number, productId: number) {

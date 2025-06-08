@@ -2,6 +2,15 @@ import ProductImage from "../models/productImage";
 import ServiceProduct from "../services/product";
 import { ProductImageAttributes } from "../types/productImage";
 export default class ServiceProductImage {
+  static async getProductImagesByProduct(product_id: number) {
+    await ServiceProduct.validateProductId(product_id);
+    return ProductImage.findAll({
+      where: { product_id },
+      order: [["display_order", "ASC"]],
+      attributes: ["image_id", "product_id", "image_url", "display_order"],
+      raw: true,
+    });
+  }
   static async createImagesToProduct(
     product_id: number,
     files: Express.Multer.File[]
@@ -9,7 +18,6 @@ export default class ServiceProductImage {
     await ServiceProduct.validateProductId(product_id);
   
     const images = files.map((file, index) => {
-      console.log("Uploaded file:", file);  // Log kiểm tra từng file
       return {
         product_id,
         image_url: `/uploads/${file.filename}`,  // Đảm bảo file có đuôi

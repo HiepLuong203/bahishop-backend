@@ -31,15 +31,6 @@ Supplier.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      validate: {
-        isEmail: {
-          msg: "Email không hợp lệ",
-        },
-      },
-    },
     contact_person: {
       type: DataTypes.STRING,
       allowNull: true,

@@ -11,10 +11,8 @@ class Product extends Model {
   public supplier_id?: number;
   public price!: number;
   public discount_price?: number;
-  public stock_quantity!: number;
   public unit!: string;
   public origin?: string;
-  public expiry_date?: Date;
   public image_url?: string;
   public rating?: number;
   public view_count?: number;
@@ -67,26 +65,12 @@ Product.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    stock_quantity: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      validate: {
-        check(value: number) {
-          if (value < 0) {
-            throw new Error("Stock_quantity cannot be negative");
-          }
-        },
-      },
-    },
     unit: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     origin: {
       type: DataTypes.STRING,
-    },
-    expiry_date: {
-      type: DataTypes.DATE,
     },
     image_url: {
       type: DataTypes.STRING,
@@ -153,4 +137,5 @@ Supplier.hasMany(Product, {
   foreignKey: "supplier_id",
   as: "products",
 });
+
 export default Product;

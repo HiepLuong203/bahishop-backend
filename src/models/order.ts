@@ -19,6 +19,8 @@ class Order extends Model {
     | "delivered"
     | "cancelled";
   public notes?: string;
+  public orderItems?: OrderItem[]
+
 }
 
 Order.init(
@@ -73,6 +75,10 @@ Order.init(
     notes: {
       type: DataTypes.TEXT,
     },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: "updated_at",
+    }
   },
   {
     sequelize,
