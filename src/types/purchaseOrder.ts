@@ -5,7 +5,6 @@ export interface PurchaseOrderAttributes {
   note?: string; 
   createdAt?: Date;
   updatedAt?: Date;
-  total_amount?: number;
 }
 export interface PurchaseOrderDetailAttributes {
   id?: number;
@@ -16,4 +15,12 @@ export interface PurchaseOrderDetailAttributes {
   total_price: number;
   createdAt?: Date;
   updatedAt?: Date;
+}
+export interface ProductInputForPurchaseOrder {
+  product_id: number;
+  quantity: number;
+  unit_price: number;
+  batch_code: string;       // Bắt buộc phải có mã lô
+  manufacture_date?: string; // Có thể là string để parse từ frontend
+  expiry_date: string;      // Bắt buộc phải có hạn sử dụng
 }

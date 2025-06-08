@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import ServicePurchaseOrder from "../services/purchaseOrder";
+import { ProductInputForPurchaseOrder } from "../types/purchaseOrder"; // Import interface mới
 
 // Controller cho PurchaseOrder
 class PurchaseOrderController {
@@ -7,9 +8,14 @@ class PurchaseOrderController {
   async createPurchaseOrder(req: Request, res: Response): Promise<void> {
     try {
       const { data, products } = req.body;
+
+      // Ép kiểu 'products' để đảm bảo type-safe với ProductInputForPurchaseOrder[]
+      // Đây là nơi bạn mong đợi client sẽ gửi đúng định dạng dữ liệu lô hàng
+      const productsWithBatchInfo: ProductInputForPurchaseOrder[] = products;
+
       const order = await ServicePurchaseOrder.createPurchaseOrder(
         data,
-        products
+        productsWithBatchInfo // Truyền mảng products đã được ép kiểu
       );
       res.status(201).json(order);
     } catch (err: any) {
@@ -50,16 +56,13 @@ class PurchaseOrderController {
   // Cập nhật đơn nhập hàng
   async updatePurchaseOrder(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.id);
-    const { data, products } = req.body;
+    const { data } = req.body;
 
     try {
-      // Gọi service để thực hiện cập nhật
       const updatedOrder = await ServicePurchaseOrder.updatePurchaseOrder(
         id,
         data,
-        products
       );
-      // Trả về kết quả
       res.status(200).json({
           message: "Purchase Order updated successfully",
           data: updatedOrder,
@@ -75,6 +78,8 @@ class PurchaseOrderController {
       res.status(500).json({ error: err.message });
     }
   }
+
+  // Lấy đơn hàng theo khoảng ngày
   async getPurchaseOrdersByDate(req: Request, res: Response): Promise<void> {
     try {
       const { from, to } = req.query;          // ?from=YYYY-MM-DD&to=YYYY-MM-DD
@@ -85,12 +90,10 @@ class PurchaseOrderController {
       const fromDate = new Date(from as string);
       const toDate   = new Date(to as string);
 
-      // kiểm tra date hợp lệ
       if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
         res.status(400).json({ message: "from/to không phải ngày hợp lệ" });return 
       }
 
-      // đảm bảo toDate >= fromDate
       if (toDate < fromDate) {
         res.status(400).json({ message: "to phải >= from" });return 
       }

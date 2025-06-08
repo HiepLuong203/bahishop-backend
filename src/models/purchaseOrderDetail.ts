@@ -9,7 +9,9 @@ class PurchaseOrderDetail extends Model {
   public product_id!: number;
   public quantity!: number;
   public unit_price!: number;
-  public total_price!: number;
+  public batch_code!: string;       // Đổi lại thành batch_code
+  public manufacture_date?: Date;
+  public expiry_date!: Date;
   public createdAt!: Date;
   public updatedAt!: Date;
 }
@@ -41,9 +43,17 @@ PurchaseOrderDetail.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    total_price: {
-      type: DataTypes.DECIMAL(12, 2),
+    batch_code: {
+      type: DataTypes.STRING,
+      allowNull: true, 
+    },
+    manufacture_date: {
+      type: DataTypes.DATEONLY,
       allowNull: true,
+    },
+    expiry_date: {
+      type: DataTypes.DATEONLY, // Hạn sử dụng bắt buộc khi nhập hàng
+      allowNull: false,
     },
     createdAt: {
       type: DataTypes.DATE,

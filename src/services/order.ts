@@ -4,12 +4,14 @@ import Product from "../models/product";
 import { OrderInput, OrderItemInput,OrderStatus,PaymentStatus } from "../types/order";
 import { Op } from "sequelize";
 import sequelize from "../config/db";
+import ServiceProductBatch from "../services/productBatch"
 export default class ServiceOrder {
   static async createOrder(user_id: number, orderData: OrderInput, items: OrderItemInput[]) {
     const transaction = await sequelize.transaction();
     try {
       const total_amount = items.reduce((sum, item) => sum + item.total_price, 0);
 
+      // Đơn hàng luôn bắt đầu với trạng thái 'pending'
       const order = await Order.create({
         user_id,
         total_amount,
@@ -19,32 +21,37 @@ export default class ServiceOrder {
         payment_method: orderData.payment_method,
         payment_status: orderData.payment_status,
         notes: orderData.notes,
+        order_status: OrderStatus.Pending, // Luôn thiết lập trạng thái ban đầu là Pending
       }, { transaction });
-    const qr_code_url = orderData.payment_method === "bank_transfer"
-      ? ServiceOrder.generateBankTransferQR(order.order_id, total_amount)
-      : null;
-    const orderItemsData = items.map((item) => ({
-      order_id: order.order_id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-      unit_price: item.unit_price,
-      discount_price: item.discount_price,
-      total_price: item.total_price,
-    }));
 
-    await OrderItem.bulkCreate(orderItemsData, { transaction });
-    await transaction.commit();
+      const qr_code_url = orderData.payment_method === "bank_transfer"
+        ? ServiceOrder.generateBankTransferQR(order.order_id, total_amount)
+        : null;
 
-    if (qr_code_url) {
-      return {
-        order,
-        qr_code_url,
-      };
-    }
+      const orderItemsToCreate = items.map((item) => ({
+        order_id: order.order_id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        fulfilled_quantity: 0, // Số lượng đã thực hiện là 0 khi tạo đơn hàng
+        unit_price: item.unit_price,
+        discount_price: item.discount_price,
+        total_price: item.total_price,
+      }));
 
-    return order;
+      await OrderItem.bulkCreate(orderItemsToCreate, { transaction });
+      await transaction.commit();
+
+      if (qr_code_url) {
+        return {
+          order,
+          qr_code_url,
+        };
+      }
+
+      return order;
     } catch (error) {
       await transaction.rollback();
+      console.error("Lỗi khi tạo đơn hàng:", error);
       throw error;
     }
   }
@@ -129,25 +136,47 @@ export default class ServiceOrder {
 
     return { message: "Admin đã hủy đơn hàng thành công." };
   }
-  static async updateOrderStatusforAdmin(order_id: number,new_status: string,new_payment_status?: string) {
-    // Khai báo danh sách hợp lệ từ enum
+  static async updateOrderStatusforAdmin(order_id: number, new_status: string, new_payment_status?: string) {
     const validOrderStatuses = Object.values(OrderStatus);
     const validPaymentStatuses = Object.values(PaymentStatus);
 
+    const transaction = await sequelize.transaction(); 
     try {
-      const order = await Order.findOne({ where: { order_id } });
+      const order = await Order.findOne({
+        where: { order_id },
+        include: [{ model: OrderItem, as: "orderItems" }], // Sequelize sẽ trả về các thể hiện của OrderItem
+        transaction: transaction,
+        lock: transaction.LOCK.UPDATE
+      });
+
       if (!order) {
         throw new Error(`Order with ID ${order_id} not found`);
       }
 
-      // Kiểm tra và gán order_status nếu hợp lệ
-      if (validOrderStatuses.includes(new_status as OrderStatus)) {
-        order.order_status = new_status as OrderStatus;
-      } else {
+      const currentOrderStatus = order.order_status;
+
+      if (!validOrderStatuses.includes(new_status as OrderStatus)) {
         throw new Error(`Invalid order_status value: ${new_status}`);
       }
 
-      // Kiểm tra và gán payment_status nếu có truyền vào và hợp lệ
+      if (currentOrderStatus === OrderStatus.Pending && new_status !== OrderStatus.Pending) {
+        const orderItems: OrderItem[] = (order as any).orderItems || []; 
+
+        for (const orderItem of orderItems) {
+          const quantityToDeductFromBatch = orderItem.quantity; 
+
+          if (quantityToDeductFromBatch > 0) {
+            await ServiceProductBatch.deductQuantityFromBatches(
+              orderItem.product_id, 
+              quantityToDeductFromBatch,
+              transaction
+            );
+          }
+        }
+      }
+
+      order.order_status = new_status as OrderStatus;
+
       if (new_payment_status !== undefined) {
         if (validPaymentStatuses.includes(new_payment_status as PaymentStatus)) {
           order.payment_status = new_payment_status as PaymentStatus;
@@ -156,18 +185,19 @@ export default class ServiceOrder {
         }
       }
 
-      await order.save();
+      await order.save({ transaction });
+      await transaction.commit();
 
       return {
-        message: "Order status updated successfully",
+        message: "Order status updated successfully and stock adjusted.",
         updatedOrder: order,
       };
-    } catch (error) {
+    } catch (error: any) {
+      await transaction.rollback();
       console.error("Error updating order status for admin:", error);
       throw error;
     }
   }
-
   static async countAllOrders() {
     const [total, order_completed, order_incompleted, order_cancel] = await Promise.all([
       // Đếm tổng đơn hàng

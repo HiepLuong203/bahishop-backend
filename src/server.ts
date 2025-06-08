@@ -12,6 +12,7 @@ import orderRoutes from "./routes/order";
 import supplierRoutes from "./routes/supplier";
 import reviewRoutes from "./routes/review"
 import webhookRoutes from "./routes/webhook"
+import productBatchRoutes from "./routes/productBatch"
 import cors from "cors";
 import path from "path";
 dotenv.config();
@@ -35,7 +36,8 @@ app.use("/api/cartitems", cartItemRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/suppliers", supplierRoutes);
 app.use("/api/reviews", reviewRoutes)
-app.use("/api/webhook",webhookRoutes)
+app.use("/api/webhook", webhookRoutes)
+app.use("/api/productbatch", productBatchRoutes)
 // Khởi động server 
 app.listen(process.env.PORT || 5000, () => {
   console.log("Server running on port 5000");

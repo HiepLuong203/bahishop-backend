@@ -5,10 +5,8 @@ export interface ProductAttributes {
     category_id?: number;
     price: number;
     discount_price?: number;
-    stock_quantity?: number;
     unit: string;
     origin?: string;
-    expiry_date?: Date;
     image_url?: string;
     rating?: number;
     view_count?: number;
