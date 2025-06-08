@@ -17,13 +17,25 @@ class CartItemController {
       const user_id = (req as any).user.id;
       const { product_id, quantity } = req.body;
 
-      const item = await CartItemService.addOrUpdateCartItem(user_id, {
+      const item = await CartItemService.addToCartItem(user_id, {
         user_id,
         product_id,
         quantity: quantity ?? 1,
       });
 
       res.status(200).json(item);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+  
+  async updateQuantity(req: Request, res: Response): Promise<void> {
+    try {
+      const user_id = (req as any).user.id;
+      const { product_id, quantity } = req.body;
+
+      const result = await CartItemService.updateCartItemQuantity(user_id, product_id, quantity);
+      res.json(result);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }

@@ -10,5 +10,5 @@ router.delete(
   authenticateToken,
   CartItemController.removeFromCart
 );
-
+router.put("/update", authenticateToken, CartItemController.updateQuantity);
 export default router;

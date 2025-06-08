@@ -39,12 +39,10 @@ class OrderController {
       const user_id = (req as any).user.id;
       const product_id = Number(req.params.product_id);
 
-      const cartItem = await CartItemService.getCartItem(user_id, product_id);
+      const cartItem = await CartItemService.getCartItemToCheckoutSingle(user_id, product_id);
 
       if (!cartItem) {
-        res
-          .status(404)
-          .json({ message: "Sản phẩm không tồn tại trong giỏ hàng" });
+        res.status(404).json({ message: "Sản phẩm không tồn tại trong giỏ hàng" });
         return;
       }
 
@@ -78,10 +76,10 @@ class OrderController {
       res.status(500).json({ message: error });return
     }
   }
-  async getAllOrders(req: Request, res: Response): Promise<void> {
+  async getAllOrdersbyUser(req: Request, res: Response): Promise<void> {
     try {
       const user_id = (req as any).user.id;
-      const orders = await ServiceOrder.getAllOrder(user_id);
+      const orders = await ServiceOrder.getAllOrderbyUser(user_id);
       res.json(orders);
     } catch (error) {
       res.status(500).json({ message: error });

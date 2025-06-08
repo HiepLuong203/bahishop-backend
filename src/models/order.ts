@@ -19,6 +19,8 @@ class Order extends Model {
     | "delivered"
     | "cancelled";
   public notes?: string;
+  public orderItems?: OrderItem[]
+
 }
 
 Order.init(

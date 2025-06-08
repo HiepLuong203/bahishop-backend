@@ -50,7 +50,7 @@ class ServiceUser {
     }
 
     const token = jwt.sign(
-      { id: user.user_id, username: user.username, role: user.role },
+      { id: user.user_id, username: user.username, role: user.role, full_name: user.full_name },
       JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -211,7 +211,8 @@ class ServiceUser {
   static async changePassword(
     userId: number,
     oldPassword: string,
-    newPassword: string
+    newPassword: string,
+    confirmPassword: string,
   ) {
     const user = await User.findByPk(userId);
     if (!user) throw new Error("Người dùng không tồn tại.");
@@ -219,6 +220,9 @@ class ServiceUser {
     const match = await bcrypt.compare(oldPassword, user.password_hash);
     if (!match) throw new Error("Mật khẩu cũ không đúng.");
 
+    if (newPassword !== confirmPassword) {
+      throw new Error("Mật khẩu mới và xác nhận không khớp.");
+    }
     user.password_hash = await bcrypt.hash(newPassword, 10);
     await user.save();
 
