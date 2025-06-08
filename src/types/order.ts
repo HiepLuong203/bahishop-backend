@@ -2,7 +2,8 @@ export interface OrderInput {
   shipping_name: string;
   shipping_phone: string;
   shipping_address: string;
-  payment_method: string;
+  payment_method: "cod" | "bank_transfer";
+  payment_status: PaymentStatus;
   notes?: string;
 }
 

@@ -17,23 +17,32 @@ export default class ServiceOrder {
         shipping_name: orderData.shipping_name,
         shipping_phone: orderData.shipping_phone,
         payment_method: orderData.payment_method,
-        payment_status: "pending",
+        payment_status: orderData.payment_status,
         notes: orderData.notes,
       }, { transaction });
+    const qr_code_url = orderData.payment_method === "bank_transfer"
+      ? ServiceOrder.generateBankTransferQR(order.order_id, total_amount)
+      : null;
+    const orderItemsData = items.map((item) => ({
+      order_id: order.order_id,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      discount_price: item.discount_price,
+      total_price: item.total_price,
+    }));
 
-      const orderItemsData = items.map((item) => ({
-        order_id: order.order_id,
-        product_id: item.product_id,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        discount_price: item.discount_price,
-        total_price: item.total_price,
-      }));
+    await OrderItem.bulkCreate(orderItemsData, { transaction });
+    await transaction.commit();
 
-      await OrderItem.bulkCreate(orderItemsData, { transaction });
+    if (qr_code_url) {
+      return {
+        order,
+        qr_code_url,
+      };
+    }
 
-      await transaction.commit();
-      return order;
+    return order;
     } catch (error) {
       await transaction.rollback();
       throw error;
@@ -55,9 +64,12 @@ export default class ServiceOrder {
           ],
         },
       ],
+      order: [
+        ['order_date', 'DESC']
+      ],
     });
   }
-  static async getAllOrder(user_id: number) {
+  static async getAllOrderbyUser(user_id: number) {
     const orders = await Order.findAll({
       where: { user_id: user_id },
       include: [
@@ -71,8 +83,12 @@ export default class ServiceOrder {
               as: "product",
               attributes: ["name"], // Lấy tên sản phẩm từ bảng Product
             },
+            
           ],
         },
+      ],
+      order: [
+        ['order_date', 'DESC']
       ],
     });
 
@@ -243,4 +259,55 @@ export default class ServiceOrder {
 
     return order;
   }
+  static generateBankTransferQR(order_id: number, amount: number) {
+  // Đây là ví dụ với QR code theo chuẩn VietQR của các ngân hàng Việt Nam
+  const bank_account = "333329082003";
+  const bank_name = "MB";
+  const account_name = "LUONG BA HIEP";
+  const description = `THANHTOAN_ORDER_${order_id}`;
+  const qrUrl = `https://img.vietqr.io/image/${bank_name}-${bank_account}-compact2.png?amount=${amount}&addInfo=${description}&accountName=${encodeURIComponent(account_name)}`;
+  
+  return qrUrl;
+}
+
+static async getOrderById(order_id: number) {
+  return Order.findOne({
+    where: { order_id },
+    include: [ 
+      {
+        model: OrderItem,
+        as: "orderItems",
+        attributes: ["product_id", "quantity", "unit_price", "discount_price", "total_price"],
+        include: [
+          {
+            model: Product,
+            as: "product",
+            attributes: ["name"],
+          },
+        ],
+      },
+    ],
+  });
+}
+
+static async updateOrderPaymentStatus(order_id: number, status: "paid" | "pending") {
+  return Order.update(
+    { payment_status: status },
+    { where: { order_id } }
+  );
+}
+
+static async addOrderItems(order_id: number, items: OrderItemInput[]) {
+  const orderItemsData = items.map(item => ({
+    order_id,
+    product_id: item.product_id,
+    quantity: item.quantity,
+    unit_price: item.unit_price,
+    discount_price: item.discount_price,
+    total_price: item.total_price,
+  }));
+
+  return OrderItem.bulkCreate(orderItemsData);
+}
+
 }

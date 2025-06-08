@@ -35,6 +35,11 @@ User.init(
       type: DataTypes.STRING(100),
       allowNull: false,
       unique: true,
+      validate: {
+        isEmail: {
+          msg: "Email không hợp lệ",
+        },
+      },
     },
     full_name: {
       type: DataTypes.STRING(100),
