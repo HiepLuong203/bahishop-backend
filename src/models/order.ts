@@ -49,6 +49,9 @@ Order.init(
     shipping_phone: {
       type: DataTypes.STRING(20),
       allowNull: false,
+      validate: {
+        is: /^[0-9\-+()\s]*$/i
+      }
     },
     shipping_name: {
       type: DataTypes.STRING(100),

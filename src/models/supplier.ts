@@ -30,6 +30,18 @@ Supplier.init(
     phone: {
       type: DataTypes.STRING,
       allowNull: true,
+      validate: {
+        is: /^[0-9\-+()\s]*$/i
+      }
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isEmail: {
+          msg: "Email is not valid",
+        },
+      },
     },
     contact_person: {
       type: DataTypes.STRING,
