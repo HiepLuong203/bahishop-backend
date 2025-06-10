@@ -48,6 +48,9 @@ User.init(
     phone_number: {
       type: DataTypes.STRING(20),
       allowNull: true,
+      validate: {
+        is: /^[0-9\-+()\s]*$/i
+      }
     },
     address: {
       type: DataTypes.TEXT,
