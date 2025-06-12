@@ -153,9 +153,9 @@ class ServiceUser {
     return { message: "Xác thực tài khoản thành công." };
   }
 
-  static async sendResetPasswordEmail(username: string, email: string) {
+  static async sendResetPasswordEmail( email: string) {
     const user = await User.findOne({
-      where: { username: username, email: email },
+      where: {  email: email },
     });
     if (!user) throw new Error("Username hoặc Email không tồn tại.");
 
@@ -163,7 +163,6 @@ class ServiceUser {
     const token = jwt.sign({ userId: user.user_id }, RESET_PASSWORD, {
       expiresIn: "15m",
     });
-
     const mailjetClient = mailjet.apiConnect(
       process.env.MJ_APIKEY_PUBLIC!,
       process.env.MJ_APIKEY_PRIVATE!
@@ -176,21 +175,21 @@ class ServiceUser {
           To: [{ Email: user.email, Name: user.username }],
           Subject: "Khôi phục mật khẩu",
           HTMLPart: `
-              <h3>Xin chào ${user.username},</h3>
-              <p>Nhấn vào liên kết bên dưới để đặt lại mật khẩu:</p>
-              <a href="http://localhost:5000/reset-password?token=${token}"
-              style="padding: 10px 20px; background-color: #007BFF; color: white; border-radius: 5px; text-decoration: none;">
-                Đặt lại mật khẩu
-              </a>
+            <h3>Xin chào ${user.username},</h3>
+            <p>Nhấn vào liên kết bên dưới để đặt lại mật khẩu:</p>
+            <a href="http://localhost:3000/reset-password?token=${token}&email=${user.email}"
+            style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">
+            Đặt lại mật khẩu
+            </a>
             `,
         },
       ],
     });
 
-    return { message: "Email đặt lại mật khẩu đã được gửi." };
+    return { message: "Email đặt lại mật khẩu đã được gửi.", token };
   }
   static async resetPassword(token: string, newPassword: string) {
-    const RESET_PASSWORD_SECRET = process.env.RESET_PASSWORD_SECRET!;
+    const RESET_PASSWORD_SECRET = process.env.DB_RESET_PASSWORD!;
     let payload: any;
 
     try {

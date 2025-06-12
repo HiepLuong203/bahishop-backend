@@ -145,7 +145,6 @@ export default class ServiceProductBatch {
         },
       }
     );
-    console.log(`Updated ${updatedRows} batches to 'expired' status.`);
   }
 //cap nhat so luong khi mua hang
   static async deductQuantityFromBatches(
