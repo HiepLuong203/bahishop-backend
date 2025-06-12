@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import UserService from "../services/user";
 
 class UserController {
-  static async register(req: Request, res: Response): Promise<void> {
+  async register(req: Request, res: Response): Promise<void> {
     try {
       const user = await UserService.register(req.body);
       res.status(201).json({
@@ -18,7 +18,7 @@ class UserController {
     }
   }
 
-  static async login(req: Request, res: Response): Promise<void> {
+  async login(req: Request, res: Response): Promise<void> {
     try {
       const { username, password } = req.body;
       const { token, user } = await UserService.login(username, password);
@@ -38,7 +38,7 @@ class UserController {
     }
   }
 
-  static async me(req: Request, res: Response): Promise<void> {
+  async me(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const user = await UserService.getProfile(userId);
@@ -48,7 +48,7 @@ class UserController {
       res.status(400).json({ message: error.message });
     }
   }
-  static async updateProfile(req: Request, res: Response) {
+  async updateProfile(req: Request, res: Response) {
     try {
       const userId = (req as any).user.id;
       const data = req.body;
@@ -59,7 +59,7 @@ class UserController {
       res.status(400).json({ error: error.message });
     }
   }
-  static async verifyEmail(req: Request, res: Response) {
+  async verifyEmail(req: Request, res: Response) {
     try {
       const { token } = req.query;
       await UserService.verifyEmail(token as string);
@@ -70,27 +70,27 @@ class UserController {
     }
   }
 
-  static async forgetPassword(req: Request, res: Response) {
+  async forgetPassword(req: Request, res: Response) {
     try {
-      const { username, email } = req.body;
-      const result = await UserService.sendResetPasswordEmail(username, email);
+      const { email } = req.body;
+      const result = await UserService.sendResetPasswordEmail(email);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
   }
-  static async resetPassword(req: Request, res: Response) {
+  async resetPassword(req: Request, res: Response): Promise<void> {
     const { token, newPassword } = req.body;
 
     try {
       const result = await UserService.resetPassword(token, newPassword);
-      return res.status(200).json(result);
+      res.status(200).json(result);return
     } catch (err: any) {
-      return res.status(400).json({ error: err.message });
+      res.status(400).json({ error: err.message });return
     }
   }
 
-  static async changePassword(req: Request, res: Response) {
+  async changePassword(req: Request, res: Response) {
     try {
       const userId = (req as any).user.id;
       const { oldPassword, newPassword, confirmPassword } = req.body;
@@ -105,7 +105,7 @@ class UserController {
       res.status(400).json({ message: error.message });
     }
   }
-  static async getCustomerStats(req: Request, res: Response) {
+  async getCustomerStats(req: Request, res: Response) {
     try {
       const result = await UserService.getAllCustomersSortedByCreatedAt();
       res.json(result);
@@ -116,4 +116,4 @@ class UserController {
 
 }
 
-export default UserController;
+export default new UserController();

@@ -37,7 +37,6 @@ export default class ServiceProductImage {
     if (!image) throw new Error("Image not found");
     // Nếu có file, cập nhật đường dẫn ảnh
     if (file) {
-      console.log("Uploaded file (update):", file); 
       data.image_url = `/uploads/${file.filename}`;  
     }
   

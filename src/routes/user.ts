@@ -18,6 +18,8 @@ router.put("/updateprofile", authenticateToken, UserController.updateProfile);
 
 router.post("/forgetpassword", UserController.forgetPassword);
 
+router.post("/resetpassword", UserController.resetPassword);
+
 router.post("/changepassword", authenticateToken, UserController.changePassword);
 
 export default router;
