@@ -1,40 +1,15 @@
-===============================
 Tạo database (lưu ý: khi ở file .env DB_NAME phải theo tên db). import file .sql vào db
-===============================
-tạo thư mục chạy code, clone repository
-git clone https://github.com/HiepLuong203/bahishop-backend.git
-===============================
-cài dependencies: npm install 
-chạy chương trình: npm run start 
-===============================
+
+tạo thư mục chạy code, clone repository git clone https://github.com/HiepLuong203/bahishop-backend.git
+
+cài dependencies: npm install chạy chương trình: npm run start
+
 Cấu trúc Backend:
-bahishop/
-│
-├── src/
-│   ├── config/                 
-│   │   └── db.ts               # Kết nối DB (Sequelize / TypeORM)
-│
-│   ├── middlewares/           
-│   │   └── auth.middleware.ts  # Gồm verifyToken + authorizeRoles
-│       └── hashMiddleware.ts       # Mã hóa và so sánh mật khẩu
-│   ├── routes/                
-│   
-│
-│   ├── controllers/           
-│
-│   ├── services/              
-│
-│   ├── models/                
-│  
-├   |── types/ định dạng dữ liệu sẽ nhập, update,...
-│
-│   └── server.ts              # Entry point khởi chạy app
-│
-├── .env
-├── tsconfig.json
-├── package.json
-└── README.md 
+
+<pre><code> ``` bahishop/ │ ├── src/ │ ├── config/ │ │ └── db.ts # Kết nối DB (Sequelize / TypeORM) │ │ ├── middlewares/ │ │ ├── auth.middleware.ts # Gồm verifyToken + authorizeRoles │ │ └── hashMiddleware.ts # Mã hóa và so sánh mật khẩu │ │ ├── routes/ │ │ ├── controllers/ │ │ ├── services/ │ │ ├── models/ │ │ └── types/ # Định dạng dữ liệu sẽ nhập, update,... │ │ └── server.ts # Entry point khởi chạy app │ ├── .env ├── tsconfig.json ├── package.json └── README.md ``` </code></pre>
+
 CẤU TRÚC FOLDER
+
 🔧 config/
     • Vai trò: Cấu hình toàn cục cho ứng dụng.
         ◦ Thiết lập kết nối với MySQL qua Sequelize.
