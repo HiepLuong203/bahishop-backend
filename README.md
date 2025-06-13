@@ -88,9 +88,8 @@ CẤU TRÚC FOLDER
     • Vai trò:
         ◦ Xử lý các chức năng trung gian như:
             ▪ Xác thực token người dùng.
-            ▪ Phân quyền theo vai trò (role-based).
             ▪ Xử lý upload hình ảnh (như dùng multer).
-        ◦ Bạn chưa gửi cụ thể file trong đây, nhưng có thể chứa: authMiddleware.ts, upload.ts, verifyRole.ts,...
+        
 
 🔁 routes/
     • Vai trò: Định nghĩa các endpoint API cho client sử dụng.
