@@ -6,7 +6,45 @@ cài dependencies: npm install chạy chương trình: npm run start
 
 Cấu trúc Backend:
 
-<pre><code> ``` bahishop/ │ ├── src/ │ ├── config/ │ │ └── db.ts # Kết nối DB (Sequelize / TypeORM) │ │ ├── middlewares/ │ │ ├── auth.middleware.ts # Gồm verifyToken + authorizeRoles │ │ └── hashMiddleware.ts # Mã hóa và so sánh mật khẩu │ │ ├── routes/ │ │ ├── controllers/ │ │ ├── services/ │ │ ├── models/ │ │ └── types/ # Định dạng dữ liệu sẽ nhập, update,... │ │ └── server.ts # Entry point khởi chạy app │ ├── .env ├── tsconfig.json ├── package.json └── README.md ``` </code></pre>
+bahishop/
+
+│
+
+├── src/
+
+│   ├── config/                 
+│   │   └── db.ts               # Kết nối DB (Sequelize / TypeORM)
+│
+
+│   ├── middlewares/           
+│   │   ├── auth.middleware.ts  # Gồm verifyToken + authorizeRoles
+
+│   │   └── hashMiddleware.ts   # Mã hóa và so sánh mật khẩu
+
+
+│   ├── routes/                
+│
+
+│   ├── controllers/           
+│
+
+│   ├── services/              
+│
+
+│   ├── models/                
+│   │                 
+│
+└── types/# Định dạng dữ liệu sẽ nhập, update,...
+│   └── server.ts             
+│
+
+├── .env
+
+├── tsconfig.json
+
+├── package.json
+
+└── README.md
 
 CẤU TRÚC FOLDER
 
