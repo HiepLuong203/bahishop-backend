@@ -1,6 +1,6 @@
 Tạo database (lưu ý: khi ở file .env DB_NAME phải theo tên db). import file .sql vào db
 
-tạo thư mục chạy code, clone repository
+tạo thư mục chạy code, clone repository:
 git clone https://github.com/HiepLuong203/bahishop-backend.git
 
 cài dependencies: 
