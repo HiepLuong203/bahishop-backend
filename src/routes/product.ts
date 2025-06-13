@@ -9,6 +9,8 @@ router.post("/", uploadImages.single("image_url"), ProductController.createProdu
 
 router.get("/", ProductController.getAllProducts);
 
+router.get("/filter-and-sort", ProductController.filterAndSortProducts);
+
 router.get("/status", authenticateToken, ProductController.getProductsByStatus);
 
 router.get('/count-all-products', authenticateToken, ProductController.countAll);

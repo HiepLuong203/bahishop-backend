@@ -125,6 +125,52 @@ class ProductController {
       res.status(500).json({ message: 'Internal server error' });
     }
   }
+  async filterAndSortProducts(req: Request, res: Response): Promise<void> {
+    try {
+      const { minPrice, maxPrice, sortBy, sortOrder, isActive } = req.query;
+
+      if (
+        sortBy &&
+        !["price", "name", "newest", "promotion", "featured"].includes(sortBy as string)
+      ) {
+        res.status(400).json({ error: "Invalid sortBy value" });
+        return;
+      }
+
+      if (sortOrder && !["ASC", "DESC"].includes(sortOrder as string)) {
+        res.status(400).json({ error: "Invalid sortOrder value" });
+        return;
+      }
+
+      if (isActive && !["true", "false", "1", "0"].includes((isActive as string).toLowerCase())) {
+        res.status(400).json({ error: "isActive must be 'true', 'false', '1', or '0'" });
+        return;
+      }
+
+      if (
+        (minPrice && isNaN(Number(minPrice))) ||
+        (maxPrice && isNaN(Number(maxPrice)))
+      ) {
+        res.status(400).json({ error: "Invalid minPrice or maxPrice value" });
+        return;
+      }
+
+      const products = await ServiceProduct.filterAndSortProducts({
+        minPrice: minPrice ? Number(minPrice) : undefined,
+        maxPrice: maxPrice ? Number(maxPrice) : undefined,
+        sortBy: sortBy as "price" | "name" | "newest" | "promotion" | "featured" | undefined,
+        sortOrder: sortOrder as "ASC" | "DESC" | undefined,
+        isActive:
+          isActive === undefined
+            ? true
+            : ["true", "1"].includes((isActive as string).toLowerCase()),
+      });
+
+      res.json(products);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 export default new ProductController();

@@ -152,4 +152,87 @@ export default class ServiceProduct {
     ]);
     return {total, activeCount, inactiveCount  };
   }
+  static async filterAndSortProducts({
+    minPrice,
+    maxPrice,
+    sortBy = "name",
+    sortOrder = "ASC",
+    isActive = true,
+  }: {minPrice?: number;
+      maxPrice?: number;
+      sortBy?: "price" | "name" | "newest" | "promotion" | "featured";
+      sortOrder?: "ASC" | "DESC";
+      isActive?: boolean;}) {
+    const whereCondition: any = {};
+
+    // Lọc sản phẩm đang hoạt động
+    if (isActive !== undefined) {
+      whereCondition.is_active = isActive;
+    }
+
+    // Lọc theo giá
+    if (minPrice !== undefined && maxPrice !== undefined) {
+      whereCondition.price = { [Op.between]: [minPrice, maxPrice] };
+    } else if (minPrice !== undefined) {
+      whereCondition.price = { [Op.gte]: minPrice };
+    } else if (maxPrice !== undefined) {
+      whereCondition.price = { [Op.lte]: maxPrice };
+    }
+
+    // Các filter đặc biệt
+    if (sortBy === "newest") {
+      whereCondition.is_new = true;
+    }
+
+    if (sortBy === "featured") {
+      whereCondition.is_featured = true;
+    }
+
+    if (sortBy === "promotion") {
+      whereCondition.discount_price = { [Op.ne]: null };
+    }
+
+    // Sắp xếp
+    let sortOption: any[] = [];
+    switch (sortBy) {
+      case "price":
+        sortOption = [["price", sortOrder]];
+        break;
+      case "name":
+        sortOption = [["name", sortOrder]];
+        break;
+      case "newest":
+        sortOption = [["createdAt", sortOrder]];
+        break;
+      case "promotion":
+        sortOption = [["discount_price", sortOrder]];
+        break;
+      case "featured":
+        sortOption = [["createdAt", sortOrder]];
+        break;
+      default:
+        sortOption = [["name", "ASC"]];
+    }
+
+    try {
+      const products = await Product.findAll({
+        where: whereCondition,
+        order:sortOption,
+        include: [
+          { model: Category, as: "category" },
+          { model: Supplier, as: "supplier", attributes: ["supplier_id", "name"] },
+          {
+            model: ProductImage,
+            as: "images",
+            separate: true,
+            order: [["display_order", "ASC"]],
+          },
+        ],
+      });
+
+      return products;
+    } catch (error: any) {
+      throw new Error(`Lỗi khi lọc và sắp xếp sản phẩm: ${error.message}`);
+    }
+  }
 }
