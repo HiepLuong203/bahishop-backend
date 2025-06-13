@@ -35,6 +35,7 @@ bahishop/
 │   │                 
 │
 └── types/# Định dạng dữ liệu sẽ nhập, update,...
+
 │   └── server.ts             
 │
 
