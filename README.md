@@ -1,3 +1,4 @@
+Tải CSDL MySQL
 Tạo database (lưu ý: khi ở file .env DB_NAME phải theo tên db). import file .sql vào db
 
 tạo thư mục chạy code, clone repository:
